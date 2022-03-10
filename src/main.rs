@@ -58,8 +58,8 @@ impl From<Edge> for (usize, usize, Direction) {
 
 #[macroquad::main("Maze")]
 async fn main() {
-    let width = 100;
-    let height = 100;
+    let width = 50;
+    let height = 50;
     let grid = generate_maze(height, width);
     loop {
         display_maze(&grid, height, width).await;
@@ -126,8 +126,8 @@ async fn display_maze(grid : &Vec<Vec<HashSet<Direction>>>, height : usize, widt
     clear_background(BLACK);
 
     let margin : f32 = 10.0;
-    let cell_width = (macroquad::window::screen_width()-margin)/(width as f32);
-    let cell_height = (macroquad::window::screen_height()-margin)/(height as f32);
+    let cell_width = (screen_width()-margin)/(width as f32);
+    let cell_height = (screen_height()-margin)/(height as f32);
 
     for i in 0..width {
         for j in 0..height {
