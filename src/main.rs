@@ -5,6 +5,16 @@ use rand::{
     thread_rng,
     seq::SliceRandom,
 };
+use macroquad::prelude::{
+    Color,
+    BLACK,
+    WHITE,
+};
+const WALL_COLOR: Color = BLACK;
+const PATH_COLOR: Color = WHITE;
+const MARGIN: f32 = 5.0;
+const WIDTH: usize = 50;
+const HEIGHT: usize = 50;
 
 ///Stores the direction of connections
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
@@ -58,11 +68,9 @@ impl From<Edge> for (usize, usize, Direction) {
 
 #[macroquad::main("Maze")]
 async fn main() {
-    let width = 50;
-    let height = 50;
-    let grid = generate_maze(height, width);
+    let grid = generate_maze(HEIGHT, WIDTH);
     loop {
-        display_maze(&grid, height, width).await;
+        display_maze(&grid, HEIGHT, WIDTH).await;
     }
 
 }
@@ -123,30 +131,35 @@ async fn display_maze(grid : &Vec<Vec<HashSet<Direction>>>, height : usize, widt
     use macroquad::{
         prelude::*,
     };
-    clear_background(BLACK);
+    clear_background(WALL_COLOR);
 
-    let margin : f32 = 10.0;
-    let cell_width = (screen_width()-margin)/(width as f32);
-    let cell_height = (screen_height()-margin)/(height as f32);
+    let cell_width = (screen_width()-MARGIN)/(width as f32);
+    let cell_height = (screen_height()-MARGIN)/(height as f32);
 
     for i in 0..width {
         for j in 0..height {
-            let x = (i as f32)*cell_width + margin;
-            let y = (j as f32)*cell_height + margin;
-            let w = cell_width-margin;
-            let h = cell_height-margin;
-            draw_rectangle(x, y, w, h, RED);
+            let x = (i as f32)*cell_width + MARGIN;
+            let y = (j as f32)*cell_height + MARGIN;
+            let w = cell_width-MARGIN;
+            let h = cell_height-MARGIN;
+
+            if i == 0 && j == 0 || i == width-1 && j == height-1{
+                draw_rectangle(x, y, w, h, RED)
+            } else {
+                draw_rectangle(x, y, w, h, PATH_COLOR);
+            }
+
 
             for d in &grid[j][i]{
                 match d{
                     Direction::N =>
-                        draw_rectangle(x, y - margin, w, margin, RED),
+                        draw_rectangle(x, y - MARGIN, w, MARGIN, PATH_COLOR),
                     Direction::E =>
-                        draw_rectangle(x + w, y, margin, h, RED),
+                        draw_rectangle(x + w, y, MARGIN, h, PATH_COLOR),
                     Direction::S =>
-                        draw_rectangle(x, y + h, w, margin, RED),
+                        draw_rectangle(x, y + h, w, MARGIN, PATH_COLOR),
                     Direction::W =>
-                        draw_rectangle(x - margin, y, margin, h, RED),
+                        draw_rectangle(x - MARGIN, y, MARGIN, h, PATH_COLOR),
                 }
             }
         }
