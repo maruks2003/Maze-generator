@@ -1,6 +1,7 @@
 use std::collections::{
     HashSet,
 };
+use std::time;
 use rand::{
     thread_rng,
     seq::SliceRandom,
@@ -13,8 +14,10 @@ use macroquad::prelude::{
 const WALL_COLOR: Color = BLACK;
 const PATH_COLOR: Color = WHITE;
 const MARGIN: f32 = 5.0;
-const WIDTH: usize = 50;
-const HEIGHT: usize = 50;
+const WIDTH: usize = 10;
+const HEIGHT: usize = 10;
+const VISUALIZE: bool = true;
+const VISUALIZE_SPEED: u64 = 5;
 
 ///Stores the direction of connections
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
@@ -68,7 +71,7 @@ impl From<Edge> for (usize, usize, Direction) {
 
 #[macroquad::main("Maze")]
 async fn main() {
-    let grid = generate_maze(HEIGHT, WIDTH);
+    let grid = generate_maze(HEIGHT, WIDTH).await;
     loop {
         display_maze(&grid, HEIGHT, WIDTH).await;
     }
@@ -77,7 +80,7 @@ async fn main() {
 
 /// Generates the maze for later use
 /// The arguments are maze height and width
-fn generate_maze(height : usize, width : usize) -> Vec<Vec<HashSet<Direction>>>{
+async fn generate_maze(height : usize, width : usize) -> Vec<Vec<HashSet<Direction>>>{
     // Create two dimensional array which can contain directions of connections
     let mut grid = vec![vec![HashSet::<Direction>::new(); width]; height];
     let mut sets = vec![vec![0; width]; height];
@@ -112,6 +115,11 @@ fn generate_maze(height : usize, width : usize) -> Vec<Vec<HashSet<Direction>>>{
 
             grid[y][x].insert(dir);
             grid[ny][nx].insert(opposite(dir));
+
+        }
+        if VISUALIZE {
+            display_maze(&grid, HEIGHT, WIDTH).await;
+            std::thread::sleep(time::Duration::from_millis(VISUALIZE_SPEED));
         }
 
     }
